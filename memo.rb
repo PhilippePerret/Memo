@@ -4,6 +4,8 @@
 
 require_relative 'xlib/required'
 
+clear
+
 choix = Q.select("Obtenir ou définir :") do |q|
   q.choices [
     {name:"Mail", value: :mail},

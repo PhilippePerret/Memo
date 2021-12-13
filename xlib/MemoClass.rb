@@ -3,12 +3,13 @@
 
 class MemoClass
 
-  CHOIX_ADD = {name:"Ajouter…", value: :add}
+CHOIX_ADD = {name:"Ajouter…", value: :add}
+CHOIX_RENONCER = {name:"Renoncer", value: nil}
 
 class << self
 
   def data
-    @data ||= YAML.load_file(data_path)
+    @data ||= YAML.load_file(data_path).sort_by { |d| - d[:x] }
   end
 
   def save_data
@@ -19,36 +20,42 @@ class << self
       # OK
       #
       # puts "Données sauvées.".vert
+      return true
     else
       #
       # Problème d'enregistrement des données
       #
       puts "Bizarrement, les données n'ont pas pu être actualisées…".rouge
+      return false
     end
   end
 
+  ##
+  # Méthode principale pour choisir un élément
   def choose
-    clear
     idx = -1
-    choix = [CHOIX_ADD] + data.sort_by do |ditem|
-      ditem[:x]
-    end.collect do |ditem|
+    choix = [CHOIX_ADD] + data.collect do |ditem|
       idx += 1
       ditem.merge(value: idx)
-    end
-    choix = Q.select("Choisir #{self.name} parmi :") do |q|
+    end + [CHOIX_RENONCER]
+
+    # puts "Les choix : #{choix.inspect}"
+
+    choix = Q.select("Choisir #{self.name} parmi :", filter: true) do |q|
       q.choices choix
       q.per_page choix.count
-    end
+    end || return
+
     if choix == :add
-      puts "Je dois apprendre à ajouter un item".jaune
+      new_data
     else
       choisir_item(choix)
     end
   end
 
   def choisir_item(item_idx)
-    puts "Item choisi : #{data[item_idx].inspect}"
+    # puts "-> choisir_item(#{item_idx})"
+    # puts "Item choisi : #{data[item_idx].inspect}"
     # 
     # Incrémenter son utilisation
     #
@@ -68,5 +75,13 @@ class << self
     puts "#{value.inspect} a été mis dans le presse-papier"
   end
 
+
+  def new_data
+    newvalue = Q.ask("Valeur à retenir :") || return
+    @data << {name: newvalue, x: 0}
+    if save_data
+      puts "La nouvelle valeur #{newvalue.inspect} de type #{self.name} a été mémorisée.".vert
+    end
+  end
 end #/<< self
 end #/MemoClass
