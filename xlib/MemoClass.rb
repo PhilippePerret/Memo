@@ -67,20 +67,21 @@ class << self
     #
     # Le mémoriser dans le presse-papier
     #
-    clip(data[item_idx][:name])
+    clip(data[item_idx][:v])
   end
 
   def clip(value)
     `printf "#{value}" | pbcopy`
-    puts "#{value.inspect} a été mis dans le presse-papier"
+    puts "La valeur #{value.inspect} a été mis dans le presse-papier"
   end
 
 
   def new_data
-    newvalue = Q.ask("Valeur à retenir :") || return
-    @data << {name: newvalue, x: 0}
+    newvalue = Q.ask("Valeur à redonner :") || return
+    newname  = Q.ask("Nom à donner à cette valeur (ne rien mettre si le nom et la valeur doivent être identiques) :") || return
+    @data << {name: newname || newvalue, x: 0, v: newvalue}
     if save_data
-      puts "La nouvelle valeur #{newvalue.inspect} de type #{self.name} a été mémorisée.".vert
+      puts "La nouvelle valeur #{newname.inspect} de type #{self.name} a été mémorisée.".vert
     end
   end
 end #/<< self
