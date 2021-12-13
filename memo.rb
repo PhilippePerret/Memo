@@ -8,8 +8,8 @@ clear
 
 choix = Q.select("Obtenir ou définir :") do |q|
   q.choices [
-    {name:"Mail", value: :mail},
     {name:"URL",  value: :url},
+    {name:"Mail", value: :mail},
     {name:"Renoncer", value: nil}
   ]
   q.per_page 3
