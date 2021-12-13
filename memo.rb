@@ -13,4 +13,7 @@ choix = Q.select("Obtenir ou définir :") do |q|
   q.per_page 3
 end
 
-puts choix
+case choix
+when :mail then Mail.choose
+when :url  then Url.choose
+end
